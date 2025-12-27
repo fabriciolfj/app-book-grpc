@@ -1,0 +1,6 @@
+/build/extracted-include-protos/test/google/protobuf/wrappers.proto
+/build/extracted-include-protos/main/google/api/visibility.proto
+/build
+/gradle
+.idea
+.gradle

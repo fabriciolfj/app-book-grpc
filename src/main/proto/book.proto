@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.github.fabriciolfk.book_server.grpc";
+option java_outer_classname = "BookProto";
+
+import "google/protobuf/empty.proto";
+
+// Serviço de Livros
+service BookService {
+  // Buscar livro por ID
+  rpc GetBook(BookRequest) returns (BookResponse);
+
+  // Listar todos os livros
+  rpc ListBooks(google.protobuf.Empty) returns (BookListResponse);
+
+  // Buscar livros por categoria
+  rpc FindBooksByCategory(CategoryRequest) returns (BookListResponse);
+
+  // Criar novo livro
+  rpc CreateBook(CreateBookRequest) returns (BookResponse);
+}
+
+// Mensagens
+message Book {
+  int32 id = 1;
+  string title = 2;
+  string author = 3;
+  string isbn = 4;
+  BookCategory category = 5;
+  double price = 6;
+}
+
+message BookRequest {
+  int32 id = 1;
+}
+
+message BookResponse {
+  Book book = 1;
+}
+
+message CategoryRequest {
+  BookCategory category = 1;
+}
+
+message BookListResponse {
+  repeated Book books = 1;
+}
+
+message CreateBookRequest {
+  string title = 1;
+  string author = 2;
+  string isbn = 3;
+  BookCategory category = 4;
+  double price = 5;
+}
+
+enum BookCategory {
+  UNKNOWN = 0;
+  FICTION = 1;
+  NON_FICTION = 2;
+  SCIENCE = 3;
+  TECHNOLOGY = 4;
+  HISTORY = 5;
+}

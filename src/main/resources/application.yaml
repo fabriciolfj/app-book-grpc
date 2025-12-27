@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: book-server
+  grpc:
+    server:
+      port: 9090
+
+logging:
+  level:
+    io.grpc: INFO
