@@ -15,7 +15,7 @@ service BookService {
   rpc ListBooks(google.protobuf.Empty) returns (BookListResponse);
 
   // Buscar livros por categoria
-  rpc FindBooksByCategory(CategoryRequest) returns (BookListResponse);
+  rpc SearchBooks(SearchRequest) returns (stream Book);
 
   // Criar novo livro
   rpc CreateBook(CreateBookRequest) returns (BookResponse);
@@ -62,4 +62,9 @@ enum BookCategory {
   SCIENCE = 3;
   TECHNOLOGY = 4;
   HISTORY = 5;
+}
+
+message SearchRequest {
+  string query = 1;
+  int32 max_results = 2;
 }

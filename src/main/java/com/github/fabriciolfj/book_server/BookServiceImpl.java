@@ -3,6 +3,7 @@ package com.github.fabriciolfj.book_server;
 import com.github.fabriciolfk.book_server.grpc.*;
 import com.google.protobuf.Empty;
 import io.grpc.stub.StreamObserver;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class BookServiceImpl extends BookServiceGrpc.BookServiceImplBase {
 
     private final Map<Integer, Book> bookRepository = new ConcurrentHashMap<>();
@@ -75,17 +77,30 @@ public class BookServiceImpl extends BookServiceGrpc.BookServiceImplBase {
     }
 
     @Override
-    public void findBooksByCategory(final CategoryRequest request,
-                                    final StreamObserver<BookListResponse> responseObserver) {
-        final List<Book> filteredBooks = bookRepository.values().stream()
-                .filter(book -> book.getCategory() == request.getCategory())
-                .collect(Collectors.toList());
+    public void searchBooks(SearchRequest request, StreamObserver<Book> responseObserver) {
+        log.info("Server Streaming - SearchBooks: query={}, maxResults={}",
+                request.getQuery(), request.getMaxResults());
 
-        BookListResponse response = BookListResponse.newBuilder()
-                .addAllBooks(filteredBooks)
-                .build();
+        String query = request.getQuery().toLowerCase();
+        int maxResults = request.getMaxResults() > 0 ? request.getMaxResults() : Integer.MAX_VALUE;
 
-        responseObserver.onNext(response);
+        bookRepository.values().stream()
+                .filter(book ->
+                        book.getTitle().toLowerCase().contains(query) ||
+                                book.getAuthor().toLowerCase().contains(query))
+                .limit(maxResults)
+                .forEach(book -> {
+                    log.info("Found book: {}", book.getTitle());
+                    responseObserver.onNext(book);
+
+                    // Simular processamento
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                });
+
         responseObserver.onCompleted();
     }
 
